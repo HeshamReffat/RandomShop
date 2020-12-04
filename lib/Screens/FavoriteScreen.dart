@@ -7,7 +7,7 @@ class FavoriteScreen extends StatefulWidget {
   var itemDatabase;
   List<Map> product;
 
-  FavoriteScreen({this.itemDatabase});
+  FavoriteScreen({this.itemDatabase,});
 
   @override
   _FavoriteScreenState createState() => _FavoriteScreenState();
@@ -34,16 +34,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         title: Text(
           'Favorite',
           style: TextStyle(color: Colors.black),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_rounded,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (ctx) => HomeScreen()));
-          },
         ),
       ),
       body: Container(

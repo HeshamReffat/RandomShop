@@ -5,103 +5,100 @@ import 'package:random_shop/Providers/DataProvider.dart';
 import 'package:random_shop/Screens/FavoriteScreen.dart';
 
 class HomeScreen extends StatefulWidget {
+  var itemsDatabase;
+  List<Map> product;
+
+  HomeScreen({this.itemsDatabase, this.product});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   var database = DataProvider();
-  var itemsDatabase;
-  List<Map> product;
   TextEditingController _searchController = TextEditingController();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    database.createDatabase().then((value) {
-      if (value != null) itemsDatabase = value;
-      database.getData(value).then((value) {
-        setState(() {
-          product = value;
-        });
-      });
-    });
-  }
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   database.createDatabase().then((value) {
+  //     if (value != null) itemsDatabase = value;
+  //     database.getData(value).then((value) {
+  //       setState(() {
+  //         product = value;
+  //       });
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Shop'),
+        elevation: 0,
+        title: Text('Shop',style: TextStyle(color: Colors.black),),
+        backgroundColor: Colors.white,
         actions: [
-          IconButton(icon: Icon(Icons.add,color: Colors.white,), onPressed: () => addItem(context),),
-          IconButton(
-            icon: Icon(Icons.favorite,color: Colors.red,),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (ctx) => FavoriteScreen(
-                  itemDatabase: itemsDatabase,
-                ),
-              ),
-            ),
-          ),
+          IconButton(icon: Icon(Icons.add_circle,color: Colors.green,size: 35,), onPressed: () => addItem(context),),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 40.0,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.black),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Icon(Icons.search,size: 30,color: Colors.grey,),
-                          ),
-                          Expanded(
-                            child: customFormField(
-                                controller: _searchController,
-                                type: TextInputType.name,
-                                hint: 'Search',
-                                borderColor: Colors.transparent,
-                                changed: (String name) {
-                                  database
-                                      .searchItem(this.itemsDatabase, name)
-                                      .then((value) {
-                                    setState(() {
-                                      product = value;
+      body: Container(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 40.0,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Icon(Icons.search,size: 30,color: Colors.grey,),
+                            ),
+                            Expanded(
+                              child: customFormField(
+                                  controller: _searchController,
+                                  type: TextInputType.name,
+                                  hint: 'Search',
+                                  borderColor: Colors.transparent,
+                                  changed: (String name) {
+                                    database
+                                        .searchItem(widget.itemsDatabase, name)
+                                        .then((value) {
+                                      setState(() {
+                                        widget.product = value;
+                                      });
                                     });
-                                  });
-                                }),
-                          ),
-                        ],
+                                  }),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: ListView.separated(
-                physics: BouncingScrollPhysics(),
-                  itemBuilder: (ctx, i) => itemBuilder(product[i]),
-                  separatorBuilder: (ctx, i) => Divider(),
-                  itemCount: product?.length ?? 0),
-            ),
-          ],
+              Expanded(
+                child: ListView.separated(
+                  physics: BouncingScrollPhysics(),
+                    itemBuilder: (ctx, i) => itemBuilder(widget.product[i]),
+                    separatorBuilder: (ctx, i) => Divider(),
+                    itemCount: widget.product?.length ?? 0),
+              ),
+            ],
+          ),
         ),
       ),
       // floatingActionButton: FloatingActionButton(
@@ -183,14 +180,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () {
                             database
                                 .updateFavorite(
-                                    database: itemsDatabase,
+                                    database: widget.itemsDatabase,
                                     favorite: product['favorite'] == 0 ? 1 : 0,
                                     id: product['id'])
                                 .then((value) {
                               setState(() {
-                                database.getData(itemsDatabase).then((value) {
+                                database.getData(widget.itemsDatabase).then((value) {
                                   setState(() {
-                                    this.product = value;
+                                    widget.product = value;
                                   });
                                 });
                               });
@@ -413,7 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                       database
                           .insertData(
-                        database: itemsDatabase,
+                        database: widget.itemsDatabase,
                         image: image,
                         name: name,
                         price: int.parse(price),
@@ -421,9 +418,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         discount: int.parse(discount),
                       )
                           .then((value) {
-                        database.getData(itemsDatabase).then((value) {
+                        database.getData(widget.itemsDatabase).then((value) {
                           setState(() {
-                            this.product = value;
+                            widget.product = value;
                           });
                         });
                         Fluttertoast.showToast(
